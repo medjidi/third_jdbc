@@ -3,6 +3,10 @@ package jm.task.core.jdbc.util;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import com.fasterxml.classmate.AnnotationConfiguration;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
 public class Util {
     private static volatile Connection connection;
@@ -11,6 +15,7 @@ public class Util {
     private static final String Driver = "com.mysql.cj.jdbc.Driver";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "root";
+
 
     public static Connection getConnection() {
 
