@@ -17,13 +17,8 @@ public class UserDaoJDBCImpl implements UserDao {
     public void createUsersTable() {
 
         try (Connection connection = Util.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS users (id BIGINT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(40), lastName VARCHAR(40), age TINYINT)");
-
-            statement.executeUpdate();
+            connection.prepareStatement("CREATE TABLE IF NOT EXISTS users (id BIGINT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(40), lastName VARCHAR(40), age TINYINT)").executeUpdate();
             connection.commit();
-            statement.close();
-
-
         } catch (SQLException e) {
             System.out.println("Database has not been created");
         }
@@ -33,10 +28,8 @@ public class UserDaoJDBCImpl implements UserDao {
     public void dropUsersTable() {
 
         try (Connection connection = Util.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("DROP TABLE IF EXISTS users");
-            statement.executeUpdate();
+            connection.createStatement().executeUpdate("DROP TABLE IF EXISTS users");
             connection.commit();
-            statement.close();
 
         } catch (SQLException e) {
             System.out.println("Database has not been dropped");
@@ -45,50 +38,32 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void saveUser(String name, String lastName, byte age) {
 
-        try (Connection connection = Util.getConnection()) {
-
-            String sql = "INSERT INTO users (name, lastName, age) VALUES (?, ?, ?)";
-            PreparedStatement statement = connection.prepareStatement(sql);
+        try (PreparedStatement statement = Util.getConnection().prepareStatement("INSERT INTO users (name, lastName, age) VALUES (?, ?, ?)")) {
             statement.setString(1, name);
             statement.setString(2, lastName);
             statement.setInt(3, age);
             statement.executeUpdate();
-            statement.close();
-            connection.commit();
-            statement.close();
-
+            statement.getConnection().commit();
         } catch (SQLException e) {
             System.out.println("Database has not been increase");
         }
     }
 
     public void removeUserById(long id) {
-
         try (Connection connection = Util.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM users WHERE id = id");
-
-            statement.executeUpdate();
+            connection.prepareStatement("DELETE FROM users WHERE id = id");
             connection.commit();
-            statement.close();
-
         } catch (SQLException e) {
-            System.out.println("Database has not been decrement");
+            System.out.println("Database has not been cleared");
         }
     }
 
     public List<User> getAllUsers() {
         List<User> list = new ArrayList<>();
-        try (Connection connection = Util.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM users");
-
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM users");
-
+        try (ResultSet resultSet = Util.getConnection().prepareStatement("SELECT * FROM users").executeQuery("SELECT * FROM users")) {
             while (resultSet.next()) {
                 list.add(new User(resultSet.getLong(1), resultSet.getString(2), resultSet.getString(3), resultSet.getByte(4)));
             }
-            statement.close();
-
-
         } catch (SQLException e) {
             System.out.println("Database has not been read");
         }
@@ -97,12 +72,8 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void cleanUsersTable() {
         try (Connection connection = Util.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("TRUNCATE users");
-
-            statement.executeUpdate();
+            connection.prepareStatement("TRUNCATE users").executeUpdate();
             connection.commit();
-            statement.close();
-
         } catch (SQLException e) {
             System.out.println("Database has not been cleared");
         }
